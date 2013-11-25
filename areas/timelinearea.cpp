@@ -554,8 +554,16 @@ FrameSpace::~FrameSpace() {}
 
 void
 FrameSpace::setScene(Scene *scene) {
+  if(m_pScene)
+    disconnect(m_pScene, SIGNAL(currentFrameChanged(int)),
+	       this, SLOT(adjustLayers()));
+
   setFirstFrameVisible(1);
   AbstractSpace::setScene(scene);
+
+  if(m_pScene)
+    connect(m_pScene, SIGNAL(currentFrameChanged(int)),
+	    this, SLOT(adjustLayers()));
 }
 
 void
