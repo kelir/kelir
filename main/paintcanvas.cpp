@@ -254,7 +254,7 @@ PaintCanvas::drawCameraFrame() {
   painter.setPen(pen);
   painter.drawRect(-(width / 2), -(height / 2), width, height);
 
-  AbstractLayer *layer = m_pDocument->currentScene()->currentLayer();
+  // AbstractLayer *layer = m_pDocument->currentScene()->currentLayer();
   // if(layer->type() == LAYER_CAMERA && layer->visible())
   {
     pen.setColor(Qt::lightGray);
@@ -325,7 +325,8 @@ PaintCanvas::mousePressEvent(QMouseEvent *event) {
       mToolActions[TOOL_ERASER]->trigger();
     else
       mToolActions[TOOL_PENCIL]->trigger();
-  } else if(mToolActions[mCurrentTool]->isEnabled())
+  }
+  else if(mToolActions[mCurrentTool]->isEnabled())
     mToolHandlers[mCurrentTool]->mousePressEvent(event, this);
 }
 
@@ -346,7 +347,7 @@ PaintCanvas::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void
-PaintCanvas::tabletEvent(QTabletEvent *event) {
+PaintCanvas::tabletEvent(QTabletEvent *) {
 }
 
 QPoint
