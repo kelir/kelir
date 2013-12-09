@@ -2,7 +2,7 @@
 #include <QImage>
 
 AbstractLayer::AbstractLayer(QString name, QObject *parent) :
-  QObject(parent), mName(name), mVisible(true), mEditable(true), m_pParent(0) {
+  QObject(parent), mName(name), mIsVisible(true), mIsEditable(true), m_pParent(0) {
 }
 
 AbstractLayer::~AbstractLayer() {}
@@ -18,13 +18,13 @@ AbstractLayer::name() {
 }
 
 bool
-AbstractLayer::visible() {
-  return mVisible;
+AbstractLayer::isVisible() {
+  return mIsVisible;
 }
 
 bool
-AbstractLayer::editable() {
-  return mEditable;
+AbstractLayer::isEditable() {
+  return mIsEditable;
 }
 
 int
@@ -49,13 +49,11 @@ AbstractLayer::setName(QString name) {
 }
 
 void
-AbstractLayer::setVisible(bool visible) {
-  mVisible = visible;
-  emit visibleSet(visible);
+AbstractLayer::setIsVisible(bool visible) {
+  mIsVisible = visible;
 }
 
 void
-AbstractLayer::setEditable(bool editable) {
-  mEditable = editable;
-  emit editableSet(editable);
+AbstractLayer::setIsEditable(bool editable) {
+  mIsEditable = editable;
 }

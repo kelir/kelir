@@ -353,10 +353,14 @@ LayerSpace::mousePressEvent(QMouseEvent *event) {
   }
 
   pos.ry() %= mLayerHeight;
-  if(mRectVisible.contains(pos))
-    layer->setVisible(!layer->visible());
-  else if(mRectEditable.contains(pos))
-    layer->setEditable(!layer->editable());
+  if(mRectVisible.contains(pos)) {
+    layer->setIsVisible(!layer->isVisible());
+    m_pScene->setIsModified();
+  }
+  else if(mRectEditable.contains(pos)) {
+    layer->setIsEditable(!layer->isEditable());
+    m_pScene->setIsModified();
+  }
   else if(layer != m_pScene->currentLayer())
     m_pScene->setCurrentLayer(layer);
   else {
@@ -480,10 +484,10 @@ LayerSpace::drawLayers() {
       painter.setPen(palette().color(QPalette::Text));
 
     path.addPath(pathEditable);
-    painter.fillPath(pathEditable, layer->editable() ? Qt::black : Qt::white);
+    painter.fillPath(pathEditable, layer->isEditable() ? Qt::black : Qt::white);
 
     path.addPath(pathVisible);
-    painter.fillPath(pathVisible, layer->visible() ? Qt::black : Qt::white);
+    painter.fillPath(pathVisible, layer->isVisible() ? Qt::black : Qt::white);
 
     opt.rect = layerRect;
     style()->drawControl(QStyle::CE_ShapedFrame, &opt, &painter, this);

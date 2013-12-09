@@ -15,20 +15,20 @@ public:
 
   QTransform transform();
   QString name();
-  bool visible();
-  bool editable();
+  bool isVisible();
+  bool isEditable();
   int level();
 
 public slots:
   void setTransform(QTransform &);
   void setName(QString);
-  void setVisible(bool);
-  void setEditable(bool);
+  void setIsVisible(bool);
+  void setIsEditable(bool);
 
 protected:
   QTransform mTransform;
   QString mName;
-  bool mVisible, mEditable;
+  bool mIsVisible, mIsEditable;
   AbstractLayer *m_pParent;
 };
 
