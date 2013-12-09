@@ -21,6 +21,16 @@ DrawableLayer::image(int frameIndex) {
   return pImage;
 }
 
+QMap<int, AbstractFrame *>::iterator
+DrawableLayer::frameIter(int frameIndex) {
+  QMap<int, AbstractFrame *>::iterator iter;
+  iter = mFrameObjs.lowerBound(frameIndex);
+  if(iter.key() != frameIndex && iter != mFrameObjs.begin())
+    --iter;
+
+  return iter;
+}
+
 void
 DrawableLayer::insertFrameObjAt(int index, AbstractFrame *frameObj) {
   static int id = 1;

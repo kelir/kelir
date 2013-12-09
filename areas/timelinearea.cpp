@@ -652,10 +652,7 @@ FrameSpace::frameAtPos(const QPoint &point) {
   int frameIndex = 0;
   DrawableLayer *layer = qobject_cast<DrawableLayer *>(layerAtPos(point));
   if(layer) {
-    frameIndex = indexAtPos(point);
-    iter = layer->frameObjs().lowerBound(frameIndex);
-    if(!layer->frameObjs().contains(frameIndex))
-      --iter;
+    iter = layer->frameIter(indexAtPos(point));
     frameIndex = iter.key();
   }
   return frameIndex;

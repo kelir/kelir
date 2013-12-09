@@ -14,6 +14,7 @@ public:
   virtual ~DrawableLayer() = 0;
 
   QMap<int, AbstractFrame *> &frameObjs() { return mFrameObjs; }
+  QMap<int, AbstractFrame *>::iterator frameIter(int);
   void insertFrameObjAt(int index, AbstractFrame *frameObj = 0);
   void deleteFrameObjAt(int index);
 
