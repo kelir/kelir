@@ -102,14 +102,17 @@ PaintCanvas::setDocument(Document *doc) {
 
 void
 PaintCanvas::setCurrentFrame(int frameIndex) {
-  static QImage *prevFrameImage = 0;
-  DrawableLayer *layer = qobject_cast<DrawableLayer *>
-    (m_pDocument->currentScene()->currentLayer());
-
   QImage *frameImage = 0;
   QPoint frameOffset;
-  if(layer) {
-    m_pEditImage->fill(qRgb(255, 255, 255));
+  m_pEditImage->fill(qRgb(255, 255, 255));
+
+  foreach(AbstractLayer *_layer, m_pDocument->currentScene()->layers()) {
+    if(!_layer->isVisible())
+      continue;
+    DrawableLayer *layer = qobject_cast<DrawableLayer *>(_layer);
+    if(!layer)
+      continue;
+
     frameImage = layer->image(frameIndex);
     if(frameImage) {
       QPainter painter(m_pEditImage);
@@ -117,7 +120,6 @@ PaintCanvas::setCurrentFrame(int frameIndex) {
       painter.drawImage(frameOffset, *frameImage);
       painter.end();
     }
-    prevFrameImage = frameImage;
   }
 
   refreshPixmap();
