@@ -5,7 +5,7 @@ VectorLayer::VectorLayer(QString name, QObject *parent) :
   DrawableLayer(name, parent) {
   // insertFrameAt(1);
   for(int f = 1; f < 40; f += 2 + (qrand() % 10))
-    insertFrameAt(f);
+    insertFrameObjAt(f);
 }
 
 VectorLayer::~VectorLayer() {}
@@ -16,6 +16,6 @@ VectorLayer::type() const {
 }
 
 AbstractFrame *
-VectorLayer::newFrame(int id, QObject *parent) {
+VectorLayer::newFrameObj(int id, QObject *parent) {
   return new VectorFrame(id, parent);
 }

@@ -86,7 +86,8 @@ ImageSequence::writeLayerRecursive(uint level,
 	out << indent << "\"frames\": {" << endl;
 
 	QMap<int, AbstractFrame *>::iterator i;
-	for(i = dlayer->frames().begin(); i != dlayer->frames().end(); ++i)
+	for(i = dlayer->frameObjs().begin();
+	    i != dlayer->frameObjs().end(); ++i)
 	  writeFrame(level + 2, out, framesDir, i.key(), i.value());
 
 	out << indent << "}\n";

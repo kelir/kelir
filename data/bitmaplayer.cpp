@@ -5,7 +5,7 @@ BitmapLayer::BitmapLayer(QString name, QObject *parent) :
   DrawableLayer(name, parent) {
   // insertFrameAt(1);
   for(int f = 1; f < 40; f += 2 + (qrand() % 10))
-    insertFrameAt(f);
+    insertFrameObjAt(f);
 }
 
 BitmapLayer::~BitmapLayer() {}
@@ -16,6 +16,6 @@ BitmapLayer::type() const {
 }
 
 AbstractFrame *
-BitmapLayer::newFrame(int id, QObject *parent) {
+BitmapLayer::newFrameObj(int id, QObject *parent) {
   return new BitmapFrame(id, parent);
 }

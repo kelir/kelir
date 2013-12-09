@@ -59,7 +59,7 @@ PaintCanvas::setFrameImage(QImage &newImage) {
     return;
 
   QMap<int, AbstractFrame *>::iterator iter;
-  iter = layer->frames().lowerBound(scene->currentFrame());
+  iter = layer->frameObjs().lowerBound(scene->currentFrame());
   if(iter.key() != scene->currentFrame())
     --iter;
 

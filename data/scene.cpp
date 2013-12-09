@@ -97,7 +97,7 @@ Scene::setCurrentFrame(int frameIndex) {
   int lastFrameIndex = 0;
   foreach(AbstractLayer * layer, mLayers) {
     if((d = qobject_cast<DrawableLayer *>(layer)))
-      lastFrameIndex = qMax(lastFrameIndex, d->lastFrameIndex());
+      lastFrameIndex = qMax(lastFrameIndex, d->lastFrame());
   }
   mCurrentFrame = qMin(frameIndex, lastFrameIndex);
   emit currentFrameChanged(frameIndex);

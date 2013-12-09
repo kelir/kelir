@@ -12,8 +12,8 @@ DrawableLayer::image(int frameIndex) {
   QImage *pImage = 0;
   QMap<int, AbstractFrame *>::iterator iter;
 
-  iter = mFrames.lowerBound(frameIndex);
-  if(!mFrames.contains(frameIndex))
+  iter = mFrameObjs.lowerBound(frameIndex);
+  if(!mFrameObjs.contains(frameIndex))
     --iter;
 
   pImage = iter.value()->m_pImage;
@@ -22,24 +22,24 @@ DrawableLayer::image(int frameIndex) {
 }
 
 void
-DrawableLayer::insertFrameAt(int index, AbstractFrame *frame) {
+DrawableLayer::insertFrameObjAt(int index, AbstractFrame *frameObj) {
   static int id = 1;
 
-  mFrames.insert(index, frame ? frame : newFrame(id++, this));
+  mFrameObjs.insert(index, frameObj ? frameObj : newFrameObj(id++, this));
 }
 
 void
-DrawableLayer::deleteFrameAt(int index) {
-  if(!mFrames.contains(index))
+DrawableLayer::deleteFrameObjAt(int index) {
+  if(!mFrameObjs.contains(index))
     return;
 
-  delete mFrames.take(index);
+  delete mFrameObjs.take(index);
 }
 
 int
-DrawableLayer::lastFrameIndex() const {
+DrawableLayer::lastFrame() const {
   int frameIndex = -1;
-  if(mFrames.count() > 0)
-    frameIndex = (mFrames.end() - 1).key();
+  if(mFrameObjs.count() > 0)
+    frameIndex = (mFrameObjs.end() - 1).key();
   return frameIndex;
 }

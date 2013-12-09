@@ -12,7 +12,7 @@ public:
   LayerEnum type() const;
 
 protected:
-  AbstractFrame *newFrame(int, QObject *);
+  AbstractFrame *newFrameObj(int, QObject *);
 };
 
 #endif /* BITMAPLAYER_HPP */

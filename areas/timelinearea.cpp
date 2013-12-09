@@ -634,7 +634,7 @@ FrameSpace::mouseDoubleClickEvent(QMouseEvent *event) {
 
   if(event->button() == Qt::LeftButton &&
      frameIndex != frameAtPos(pos)) {
-    layer->insertFrameAt(frameIndex);
+    layer->insertFrameObjAt(frameIndex);
     m_pScene->setCurrentFrame(m_pScene->currentFrame());
     refreshPixmap(true);
     update();
@@ -653,8 +653,8 @@ FrameSpace::frameAtPos(const QPoint &point) {
   DrawableLayer *layer = qobject_cast<DrawableLayer *>(layerAtPos(point));
   if(layer) {
     frameIndex = indexAtPos(point);
-    iter = layer->frames().lowerBound(frameIndex);
-    if(!layer->frames().contains(frameIndex))
+    iter = layer->frameObjs().lowerBound(frameIndex);
+    if(!layer->frameObjs().contains(frameIndex))
       --iter;
     frameIndex = iter.key();
   }
@@ -786,11 +786,12 @@ FrameSpace::drawFrames() {
     if(!layer)
       continue;
 
-    iter = layer->frames().lowerBound(mFirstFrameVisible);
-    endIter = layer->frames().upperBound(mFirstFrameVisible + mFramesVisible);
-    if(iter != layer->frames().begin() && iter.key() > mFirstFrameVisible)
+    iter = layer->frameObjs().lowerBound(mFirstFrameVisible);
+    endIter = layer->frameObjs()
+      .upperBound(mFirstFrameVisible + mFramesVisible);
+    if(iter != layer->frameObjs().begin() && iter.key() > mFirstFrameVisible)
       iter -= 1;
-    if(endIter != layer->frames().end())
+    if(endIter != layer->frameObjs().end())
       endIter += 1;
     while(iter != endIter) {
       extraLength = (iter + 1 == endIter) ? 0
@@ -936,21 +937,21 @@ FrameSpace::frameTranslateEnd(QMouseEvent *) {
         continue;
 
       for(int j = jStart, jTarget = 0; j != jEnd; j += jDelta) {
-        if(!layer->frames().contains(j))
+        if(!layer->frameObjs().contains(j))
           continue;
 
-        frame = layer->frames().take(j);
+        frame = layer->frameObjs().take(j);
         jTarget = j + frameDelta;
-        if(layer->frames().contains(jTarget))
-          layer->deleteFrameAt(jTarget);
+        if(layer->frameObjs().contains(jTarget))
+          layer->deleteFrameObjAt(jTarget);
 
         if(jTarget < 0)
           delete frame;
         else
-          layer->insertFrameAt(jTarget, frame);
+          layer->insertFrameObjAt(jTarget, frame);
 
         if(j == 1 && frameDelta > 0)
-          layer->insertFrameAt(j);
+          layer->insertFrameObjAt(j);
       }
     }
     mIsDragging = false;

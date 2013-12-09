@@ -13,18 +13,18 @@ public:
   explicit DrawableLayer(QString name, QObject *parent = 0);
   virtual ~DrawableLayer() = 0;
 
-  QMap<int, AbstractFrame *> &frames() {
-    return mFrames;
+  QMap<int, AbstractFrame *> &frameObjs() {
+    return mFrameObjs;
   }
-  void insertFrameAt(int index, AbstractFrame *frame = 0);
-  void deleteFrameAt(int index);
+  void insertFrameObjAt(int index, AbstractFrame *frameObj = 0);
+  void deleteFrameObjAt(int index);
 
-  virtual int lastFrameIndex() const;
+  virtual int lastFrame() const;
   virtual QImage *image(int);
 
 protected:
-  virtual AbstractFrame *newFrame(int, QObject *) = 0;
-  QMap<int, AbstractFrame *> mFrames;
+  virtual AbstractFrame *newFrameObj(int, QObject *) = 0;
+  QMap<int, AbstractFrame *> mFrameObjs;
 };
 
 #endif /* DRAWABLELAYER_HPP */
