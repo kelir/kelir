@@ -58,32 +58,13 @@ PaintCanvas::setFrameImage(QImage &newImage) {
 
   AbstractFrame *frame = iter.value();
   if(frame->m_pImage) {
-    QImage *baseImage = frame->m_pImage;
-    QRect baseRect = baseImage->rect().translated(baseImage->offset());
-    QRect newRect = newImage.rect().translated(newImage.offset());
-    QRect unionRect = baseRect.united(newRect);
-
-    QImage *unionImage = 0;
-    if(unionRect == baseRect)
-      unionImage = baseImage;
-    else {
-      unionImage = new QImage(unionRect.size(),
-                              QImage::Format_ARGB32_Premultiplied);
-      unionImage->fill(0);
-      unionImage->setOffset(unionRect.topLeft());
-    }
-
-    QPainter painter(unionImage);
-    if(unionImage != baseImage)
-      painter.drawImage(baseRect.topLeft() - unionRect.topLeft(), *baseImage);
-    painter.drawImage(newRect.topLeft() - unionRect.topLeft(), newImage);
-    painter.end();
-
-    if(unionImage != baseImage) {
+    QImage *unionImage = compositeFrameImages(frame->m_pImage, newImage);
+    if(unionImage != frame->m_pImage) {
       delete frame->m_pImage;
       frame->m_pImage = unionImage;
     }
-  } else
+  }
+  else
     frame->m_pImage = new QImage(newImage);
 
   scene->setIsModified();
@@ -353,6 +334,31 @@ PaintCanvas::setupToolHandlers() {
 
 void
 PaintCanvas::setupShortcuts() {
+}
+
+QImage *
+PaintCanvas::compositeFrameImages(QImage *baseImage, QImage &newImage) {
+  QRect baseRect = baseImage->rect().translated(baseImage->offset());
+  QRect newRect = newImage.rect().translated(newImage.offset());
+  QRect unionRect = baseRect.united(newRect);
+
+  QImage *unionImage = 0;
+  if(unionRect == baseRect)
+    unionImage = baseImage;
+  else {
+    unionImage = new QImage(unionRect.size(),
+			    QImage::Format_ARGB32_Premultiplied);
+    unionImage->fill(0);
+    unionImage->setOffset(unionRect.topLeft());
+  }
+
+  QPainter painter(unionImage);
+  if(unionImage != baseImage)
+    painter.drawImage(baseRect.topLeft() - unionRect.topLeft(), *baseImage);
+  painter.drawImage(newRect.topLeft() - unionRect.topLeft(), newImage);
+  painter.end();
+
+  return unionImage;
 }
 
 void

@@ -70,6 +70,7 @@ private:
   void drawCameraFrame();
   void setupToolHandlers();
   void setupShortcuts();
+  QImage *compositeFrameImages(QImage *baseImage, QImage &newImage);
 
   ToolsEnums mCurrentTool;
   QVector<AbstractTool *> mToolHandlers;
