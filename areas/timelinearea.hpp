@@ -31,9 +31,7 @@ namespace TimeLineUI {
     static const int mButtonWidth;
     static const int mFrameWidth;
 
-    int framesVisible() {
-      return mFramesVisible;
-    }
+    int framesVisible()  { return mFramesVisible; }
     void setScene(Scene *);
 
   public slots:
@@ -80,9 +78,7 @@ namespace TimeLineUI {
     static const int mLayerHeight;
     static const int mFrameWidth;
 
-    int layersVisible() {
-      return mLayersVisible;
-    }
+    int layersVisible() { return mLayersVisible; }
     virtual void setScene(Scene *);
 
   public slots:

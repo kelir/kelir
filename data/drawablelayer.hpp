@@ -13,9 +13,7 @@ public:
   explicit DrawableLayer(QString name, QObject *parent = 0);
   virtual ~DrawableLayer() = 0;
 
-  QMap<int, AbstractFrame *> &frameObjs() {
-    return mFrameObjs;
-  }
+  QMap<int, AbstractFrame *> &frameObjs() { return mFrameObjs; }
   void insertFrameObjAt(int index, AbstractFrame *frameObj = 0);
   void deleteFrameObjAt(int index);
 

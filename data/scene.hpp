@@ -10,16 +10,17 @@ class AbstractLayer;
 class Scene : public QObject {
   Q_OBJECT;
 public:
-  explicit Scene(QString name, QObject *parent = 0);
+  explicit Scene(QString name = QString(), QObject *parent = 0);
   virtual ~Scene();
 
-  int duration();
-  QString name();
-  int currentFrame();
-  QImage *layerFrameImage();
-  QList<AbstractLayer *> &layers();
-  AbstractLayer *currentLayer();
+
+  int duration() { return mDuration; }
+  QString name() { return mName; }
+  int currentFrame() { return mCurrentFrame; }
+  QList<AbstractLayer *> &layers() { return mLayers; }
+  AbstractLayer *currentLayer() { return m_pCurrentLayer; }
   bool setCurrentLayer(AbstractLayer *);
+  QImage *layerFrameImage();
 
 public slots:
   void setIsModified();

@@ -11,20 +11,10 @@ Document::Document(QObject *parent) : QObject(parent), mIsModified(false) {
 
 Document::~Document() {}
 
-QString
-Document::filePath() {
-  return mFilePath;
-}
-
 void
 Document::setFilePath(QString &fp) {
   mFilePath = fp;
   emit modified();
-}
-
-bool
-Document::isModified() {
-  return mIsModified;
 }
 
 void
@@ -45,20 +35,10 @@ Document::duration() {
   return totalDuration;
 }
 
-QSize
-Document::resolution() {
-  return mResolution;
-}
-
 void
 Document::setResolution(const QSize &res) {
   mResolution = res;
   emit modified();
-}
-
-QList<Scene *> &
-Document::scenes() {
-  return mScenes;
 }
 
 Scene *

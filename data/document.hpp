@@ -12,11 +12,12 @@ public:
   explicit Document(QObject *parent = 0);
   virtual ~Document();
 
-  QString filePath();
-  bool isModified();
-  QSize resolution();
+
+  QString filePath() { return mFilePath; }
+  bool isModified() { return mIsModified; }
+  QSize resolution() { return mResolution; }
+  QList<Scene *> &scenes() { return mScenes; }
   Scene *currentScene();
-  QList<Scene *> &scenes();
   int duration();
 
 public slots:

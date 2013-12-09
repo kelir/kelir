@@ -10,12 +10,12 @@ VectorLayer::VectorLayer(QString name, QObject *parent) :
 
 VectorLayer::~VectorLayer() {}
 
-LayerEnum
-VectorLayer::type() const {
-  return LAYER_VECTOR;
-}
-
 AbstractFrame *
 VectorLayer::newFrameObj(int id, QObject *parent) {
   return new VectorFrame(id, parent);
+}
+
+LayerEnum
+VectorLayer::type() const {
+  return LAYER_VECTOR;
 }

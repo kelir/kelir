@@ -21,39 +21,16 @@ Scene::Scene(QString name, QObject *parent) :
 
   mDuration = DEFAULT_SCENE_DURATION;
   m_pCurrentLayer = layer1;
+
+
 }
 
 Scene::~Scene() {}
-
-int
-Scene::duration() {
-  return mDuration;
-}
-
-QString
-Scene::name() {
-  return mName;
-}
-
-int
-Scene::currentFrame() {
-  return mCurrentFrame;
-}
 
 QImage *
 Scene::layerFrameImage() {
   DrawableLayer *layer = qobject_cast<DrawableLayer *>(m_pCurrentLayer);
   return layer ? layer->image(mCurrentFrame) : 0;
-}
-
-QList<AbstractLayer *> &
-Scene::layers() {
-  return mLayers;
-}
-
-AbstractLayer *
-Scene::currentLayer() {
-  return m_pCurrentLayer;
 }
 
 bool

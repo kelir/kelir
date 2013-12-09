@@ -32,11 +32,6 @@ PaintCanvas::PaintCanvas(QWidget *parent) :
   m_pCursorLine = new QLineF(0, 0, 0, 0);
 }
 
-QImage *
-PaintCanvas::editImage() const {
-  return m_pEditImage;
-}
-
 void
 PaintCanvas::setEditImage(QImage image) {
   *m_pEditImage = image;
@@ -455,4 +450,14 @@ PaintCanvas::viewTransformEnd(QMouseEvent *) {
   resetViewTransform();
 
   refreshCurrentFrame();
+}
+
+void
+PaintCanvas::setCurrentTool(ToolsEnums tool) {
+  mCurrentTool = tool;
+}
+
+QAction *
+PaintCanvas::toolAction(ToolsEnums tool) const {
+  return mToolActions[tool];
 }

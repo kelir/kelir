@@ -7,26 +7,6 @@ AbstractLayer::AbstractLayer(QString name, QObject *parent) :
 
 AbstractLayer::~AbstractLayer() {}
 
-QTransform
-AbstractLayer::transform() {
-  return mTransform;
-}
-
-QString
-AbstractLayer::name() {
-  return mName;
-}
-
-bool
-AbstractLayer::isVisible() {
-  return mIsVisible;
-}
-
-bool
-AbstractLayer::isEditable() {
-  return mIsEditable;
-}
-
 int
 AbstractLayer::level() {
   int l = 0;

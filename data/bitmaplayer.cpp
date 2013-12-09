@@ -10,12 +10,12 @@ BitmapLayer::BitmapLayer(QString name, QObject *parent) :
 
 BitmapLayer::~BitmapLayer() {}
 
-LayerEnum
-BitmapLayer::type() const {
-  return LAYER_BITMAP;
-}
-
 AbstractFrame *
 BitmapLayer::newFrameObj(int id, QObject *parent) {
   return new BitmapFrame(id, parent);
+}
+
+LayerEnum
+BitmapLayer::type() const {
+  return LAYER_BITMAP;
 }

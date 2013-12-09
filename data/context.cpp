@@ -20,19 +20,9 @@ Context::instance() {
   return m_pInstance;
 }
 
-Document *
-Context::currentDocument() const {
-  return m_pCurrentDocument;
-}
-
 void
 Context::setCurrentDocument(Document *d) {
   m_pCurrentDocument = d;
-}
-
-QSize
-Context::baseSize() const {
-  return mBaseSize;
 }
 
 void

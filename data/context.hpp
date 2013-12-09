@@ -12,9 +12,10 @@ class Context : public QObject {
   Q_OBJECT;
 public:
   static Context *instance();
-  Document *currentDocument() const;
+
+  Document *currentDocument() const { return m_pCurrentDocument; }
   void setCurrentDocument(Document *d);
-  QSize baseSize() const;
+  QSize baseSize() const { return mBaseSize; }
   void setBaseSize(QSize size);
 
 private:

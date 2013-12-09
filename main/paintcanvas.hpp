@@ -20,32 +20,20 @@ public:
   PaintCanvas(QWidget *parent = 0);
   virtual ~PaintCanvas() {}
 
-  QImage *editImage() const;
+  QImage *editImage() const { return m_pEditImage; }
   void setEditImage(QImage image);
   QImage *frameImage() const;
   void setFrameImage(QImage &image);
-  bool isPainting() const {
-    return mIsPainting;
-  }
+  bool isPainting() const { return mIsPainting; }
   void setIsPainting(bool isPainting);
-  QTransform transform() const {
-    return mViewTransform;
-  }
+  QTransform transform() const { return mViewTransform; }
   void setViewTransform(QTransform transform);
   void setUserTransform(QTransform transform);
 
-  ToolsEnums currentTool() const {
-    return mCurrentTool;
-  }
-  void setCurrentTool(ToolsEnums tool) {
-    mCurrentTool = tool;
-  }
-  const QActionGroup *toolActionGroup() const {
-    return m_pToolActionGroup;
-  }
-  QAction *toolAction(ToolsEnums tool) const {
-    return mToolActions[tool];
-  }
+  ToolsEnums currentTool() const { return mCurrentTool; }
+  void setCurrentTool(ToolsEnums tool);
+  const QActionGroup *toolActionGroup() const { return m_pToolActionGroup; }
+  QAction *toolAction(ToolsEnums tool) const;
 
   void refreshPixmap();
   void refreshPixmap(const QRect &);

@@ -13,11 +13,12 @@ public:
 
   virtual LayerEnum type() const = 0;
 
-  QTransform transform();
-  QString name();
-  bool isVisible();
-  bool isEditable();
+  QTransform transform() { return mTransform; }
+  QString name() { return mName; }
+  bool isVisible() { return mIsVisible; }
+  bool isEditable() { return mIsEditable; }
   int level();
+
 
 public slots:
   void setTransform(QTransform &);
