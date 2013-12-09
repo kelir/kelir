@@ -55,7 +55,7 @@ PaintCanvas::setFrameImage(QImage &image) {
   image.setOffset(offset);
   scene->setLayerFrameImage(image);
 
-  m_pDocument->setIsModified(true);
+  scene->setIsModified();
   refreshCurrentFrame();
 }
 
@@ -79,10 +79,10 @@ PaintCanvas::setDocument(Document *doc) {
   Scene *scene = 0;
   if(m_pDocument) {
     scene = m_pDocument->currentScene();
-    disconnect(scene, SIGNAL(currentLayerChanged(AbstractLayer *)),
-               this, SLOT(setCurrentLayer(AbstractLayer *)));
     disconnect(scene, SIGNAL(currentFrameChanged(int)),
                this, SLOT(setCurrentFrame(int)));
+    disconnect(scene, SIGNAL(modified()),
+               this, SLOT(refreshCurrentLayer()));
   }
 
   m_pDocument = doc;
@@ -92,10 +92,10 @@ PaintCanvas::setDocument(Document *doc) {
 
   if(m_pDocument) {
     scene = m_pDocument->currentScene();
-    connect(scene, SIGNAL(currentLayerChanged(AbstractLayer *)),
-            this, SLOT(setCurrentLayer(AbstractLayer *)));
     connect(scene, SIGNAL(currentFrameChanged(int)),
             this, SLOT(setCurrentFrame(int)));
+    connect(scene, SIGNAL(modified()),
+	    this, SLOT(refreshCurrentLayer()));
     refreshCurrentFrame();
   }
 }
@@ -124,17 +124,23 @@ PaintCanvas::setCurrentFrame(int frameIndex) {
 }
 
 void
+PaintCanvas::refreshCurrentLayer() {
+  if(!m_pDocument)
+    return;
+
+  AbstractLayer *layer = m_pDocument->currentScene()->currentLayer();
+  m_pToolActionGroup->setEnabled(layer->inherits("DrawableLayer") &&
+				 layer->isVisible() &&
+				 layer->isEditable());
+  refreshCurrentFrame();
+}
+
+void
 PaintCanvas::refreshCurrentFrame() {
   if(!m_pDocument)
     return;
 
   setCurrentFrame(m_pDocument->currentScene()->currentFrame());
-}
-
-void
-PaintCanvas::setCurrentLayer(AbstractLayer *layer) {
-  m_pToolActionGroup->setEnabled(layer->inherits("DrawableLayer"));
-  refreshCurrentFrame();
 }
 
 void

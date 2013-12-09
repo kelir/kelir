@@ -61,25 +61,31 @@ Scene::setCurrentLayer(AbstractLayer *layer) {
   if(mLayers.indexOf(layer) == -1)
     return false;
 
-  m_pCurrentLayer->setActive(false);
-  layer->setActive(true);
-
   m_pCurrentLayer = layer;
-  emit currentLayerChanged(layer);
+  emit modified();
 
   return true;
 }
 
 void
+Scene::setIsModified() {
+  Document *document = qobject_cast<Document *>(parent());
+  if(document)
+    document->setIsModified(true);
+
+  emit modified();
+}
+
+void
 Scene::setDuration(int duration) {
   mDuration = duration;
-  emit durationChanged(duration);
+  setIsModified();
 }
 
 void
 Scene::setName(QString &name) {
   mName = name;
-  emit nameChanged(name);
+  setIsModified();
 }
 
 void
@@ -138,7 +144,5 @@ Scene::setLayerFrameImage(QImage &newImage) {
   } else
     frame->m_pImage = new QImage(newImage);
 
-  Document *doc = qobject_cast<Document *>(parent());
-  if(doc)
-    doc->setIsModified(true);
+  setIsModified();
 }

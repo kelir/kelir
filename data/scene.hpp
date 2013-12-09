@@ -22,16 +22,15 @@ public:
   bool setCurrentLayer(AbstractLayer *);
 
 public slots:
+  void setIsModified();
   void setDuration(int duration);
   void setName(QString &name);
   void setCurrentFrame(int frameIndex);
   void setLayerFrameImage(QImage &image);
 
 signals:
-  void durationChanged(int duration);
-  void nameChanged(QString name);
   void currentFrameChanged(int frameIndex);
-  void currentLayerChanged(AbstractLayer *);
+  void modified();
 
 protected:
   int mDuration;

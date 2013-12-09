@@ -53,7 +53,7 @@ public:
 public slots:
   void setDocument(Document *);
   void setCurrentFrame(int);
-  void setCurrentLayer(AbstractLayer *);
+  void refreshCurrentLayer();
   void refreshCurrentFrame();
 
 protected:
