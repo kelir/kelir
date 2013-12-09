@@ -20,17 +20,10 @@ public:
   int level();
 
 public slots:
-  void setActive(bool);
   void setTransform(QTransform &);
   void setName(QString);
   void setVisible(bool);
   void setEditable(bool);
-
-signals:
-  void activeSet(bool);
-  void nameSet(QString);
-  void visibleSet(bool);
-  void editableSet(bool);
 
 protected:
   QTransform mTransform;

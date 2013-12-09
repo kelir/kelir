@@ -39,11 +39,6 @@ AbstractLayer::level() {
 }
 
 void
-AbstractLayer::setActive(bool active) {
-  emit activeSet(active);
-}
-
-void
 AbstractLayer::setTransform(QTransform &transform) {
   mTransform = transform;
 }
@@ -51,7 +46,6 @@ AbstractLayer::setTransform(QTransform &transform) {
 void
 AbstractLayer::setName(QString name) {
   mName = name;
-  emit nameSet(name);
 }
 
 void
