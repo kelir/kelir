@@ -26,7 +26,6 @@ public slots:
   void setDuration(int duration);
   void setName(QString &name);
   void setCurrentFrame(int frameIndex);
-  void setLayerFrameImage(QImage &image);
 
 signals:
   void currentFrameChanged(int frameIndex);

@@ -49,11 +49,49 @@ PaintCanvas::frameImage() const {
 }
 
 void
-PaintCanvas::setFrameImage(QImage &image) {
+PaintCanvas::setFrameImage(QImage &newImage) {
   Scene *scene = m_pDocument->currentScene();
-  QPoint offset = mViewTransform.inverted().map(image.offset());
-  image.setOffset(offset);
-  scene->setLayerFrameImage(image);
+  QPoint offset = mViewTransform.inverted().map(newImage.offset());
+  newImage.setOffset(offset);
+
+  DrawableLayer *layer = qobject_cast<DrawableLayer *>(scene->currentLayer());
+  if(!layer)
+    return;
+
+  QMap<int, AbstractFrame *>::iterator iter;
+  iter = layer->frames().lowerBound(scene->currentFrame());
+  if(iter.key() != scene->currentFrame())
+    --iter;
+
+  AbstractFrame *frame = iter.value();
+  if(frame->m_pImage) {
+    QImage *baseImage = frame->m_pImage;
+    QRect baseRect = baseImage->rect().translated(baseImage->offset());
+    QRect newRect = newImage.rect().translated(newImage.offset());
+    QRect unionRect = baseRect.united(newRect);
+
+    QImage *unionImage = 0;
+    if(unionRect == baseRect)
+      unionImage = baseImage;
+    else {
+      unionImage = new QImage(unionRect.size(),
+                              QImage::Format_ARGB32_Premultiplied);
+      unionImage->fill(0);
+      unionImage->setOffset(unionRect.topLeft());
+    }
+
+    QPainter painter(unionImage);
+    if(unionImage != baseImage)
+      painter.drawImage(baseRect.topLeft() - unionRect.topLeft(), *baseImage);
+    painter.drawImage(newRect.topLeft() - unionRect.topLeft(), newImage);
+    painter.end();
+
+    if(unionImage != baseImage) {
+      delete frame->m_pImage;
+      frame->m_pImage = unionImage;
+    }
+  } else
+    frame->m_pImage = new QImage(newImage);
 
   scene->setIsModified();
   refreshCurrentFrame();
