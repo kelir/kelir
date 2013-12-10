@@ -52,8 +52,8 @@ protected:
   void mouseReleaseEvent(QMouseEvent *);
   void tabletEvent(QTabletEvent *);
 
-  QPoint posViewFromReal(QPoint);
-  QPoint posRealFromView(QPoint);
+  QPoint posViewFromReal(QPoint p) { return mViewTransform.map(p); }
+  QPoint posRealFromView(QPoint p) { return mViewTransform.inverted().map(p); }
 
   void viewTransformStart(QMouseEvent *);
   void viewTransform(QMouseEvent *);

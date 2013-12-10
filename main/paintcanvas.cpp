@@ -46,7 +46,7 @@ PaintCanvas::frameImage() const {
 void
 PaintCanvas::setFrameImage(QImage &newImage, bool doComposite) {
   Scene *scene = m_pDocument->currentScene();
-  QPoint offset = mViewTransform.inverted().map(newImage.offset());
+  QPoint offset = posRealFromView(newImage.offset());
   newImage.setOffset(offset);
 
   DrawableLayer *layer = qobject_cast<DrawableLayer *>(scene->currentLayer());
@@ -123,7 +123,7 @@ PaintCanvas::setCurrentFrame(int frameIndex) {
     frameImage = layer->image(frameIndex);
     if(frameImage) {
       QPainter painter(m_pEditImage);
-      frameOffset = mViewTransform.map(frameImage->offset());
+      frameOffset = posViewFromReal(frameImage->offset());
       painter.drawImage(frameOffset, *frameImage);
       painter.end();
     }
@@ -388,16 +388,6 @@ PaintCanvas::mouseReleaseEvent(QMouseEvent *event) {
 
 void
 PaintCanvas::tabletEvent(QTabletEvent *) {
-}
-
-QPoint
-PaintCanvas::posViewFromReal(QPoint pos) {
-  return mViewTransform.map(pos);
-}
-
-QPoint
-PaintCanvas::posRealFromView(QPoint pos) {
-  return mViewTransform.inverted().map(pos);
 }
 
 void
