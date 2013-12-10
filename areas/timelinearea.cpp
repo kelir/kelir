@@ -954,6 +954,7 @@ FrameSpace::frameTranslateEnd(QMouseEvent *) {
     mIsDragging = false;
     mSelectionRect.setRect(0, 0, 0, 0);
     m_pScene->setCurrentFrame(m_pScene->currentFrame());
+    m_pScene->setIsModified();
   }
 }
 

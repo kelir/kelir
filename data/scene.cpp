@@ -39,7 +39,7 @@ Scene::setCurrentLayer(AbstractLayer *layer) {
     return false;
 
   m_pCurrentLayer = layer;
-  emit modified();
+  setIsModified();
 
   return true;
 }
@@ -79,4 +79,3 @@ Scene::setCurrentFrame(int frameIndex) {
   mCurrentFrame = qMin(frameIndex, lastFrameIndex);
   emit currentFrameChanged(frameIndex);
 }
-

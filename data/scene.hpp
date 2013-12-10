@@ -13,7 +13,6 @@ public:
   explicit Scene(QString name = QString(), QObject *parent = 0);
   virtual ~Scene();
 
-
   int duration() { return mDuration; }
   QString name() { return mName; }
   int currentFrame() { return mCurrentFrame; }
