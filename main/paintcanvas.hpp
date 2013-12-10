@@ -82,7 +82,7 @@ private:
   FrameCache *m_pFrameCache;
 
   QPixmap mPixmap;
-  QImage *m_pBufferImage, *m_pEditImage;
+  QImage mOverlay, *m_pBufferImage, *m_pEditImage;
   QTransform mCenterTransform, mViewTransform, mUserTransform, mTempTransform;
   bool mIsPainting, mIsDragging;
   QPoint mDragOriginPos, mDragTempPos;

@@ -103,6 +103,7 @@ PaintCanvas::setDocument(Document *doc) {
             this, SLOT(setCurrentFrame(int)));
     connect(scene, SIGNAL(modified()),
 	    this, SLOT(refreshCurrentLayer()));
+    resetBufferImage();
     refreshCurrentFrame();
   }
 }
@@ -203,6 +204,11 @@ PaintCanvas::resetBufferImage() {
   else
     m_pEditImage = new QImage(image);
 
+  if(m_pDocument) {
+    mOverlay = QImage(m_pDocument->resolution() + QSize(10, 10),
+		      QImage::Format_ARGB32_Premultiplied);
+    drawCameraFrame();
+  }
   mPixmap = QPixmap(size());
   mPixmap.fill();
 }
@@ -215,40 +221,18 @@ PaintCanvas::refreshPixmap() {
 void
 PaintCanvas::refreshPixmap(const QRect &rect) {
   QPoint offset;
-  mPixmap.fill();
-
   QPainter painter;
   painter.begin(&mPixmap);
   painter.initFrom(this);
-
-  // Scene *scene = m_pDocument->currentScene();
-  // DrawableLayer *layer = 0;
-  // QImage *image = 0;
-  // foreach(AbstractLayer *_layer, scene->layers()) {
-  //   if(_layer == scene->currentLayer() && m_pEditImage) {
-  //     offset = m_pEditImage->offset() + rect.topLeft();
-  //     painter.drawImage(offset, *m_pEditImage, rect);
-  //     continue;
-  //   }
-  // 
-  //   layer = qobject_cast<DrawableLayer *>(_layer);
-  //   if(!layer)
-  //     continue;
-  //   image = layer->image(scene->currentFrame());
-  //   if(image) {
-  //     offset = image->offset() + rect.topLeft();
-  //     painter.drawImage(offset, *image, rect);
-  //   }
-  // }
 
   if(m_pEditImage) {
     offset = m_pEditImage->offset() + rect.topLeft();
     painter.drawImage(offset, *m_pEditImage, rect);
   }
+  painter.setTransform(mViewTransform);
+  painter.drawImage(mOverlay.offset(), mOverlay, mOverlay.rect());
 
   painter.end();
-  drawCameraFrame();
-
   update(rect);
 }
 
@@ -257,12 +241,15 @@ PaintCanvas::drawCameraFrame() {
   if(!m_pDocument)
     return;
 
-  QSize resolution = m_pDocument->resolution();
+  QSize resolution(m_pDocument->resolution());
+  QPoint offset(mOverlay.rect().center());
+  mOverlay.setOffset(-offset);
+
   QPen pen;
   pen.setColor(Qt::darkGray);
   QPainter painter;
-  painter.begin(&mPixmap);
-  painter.setTransform(mViewTransform);
+  painter.begin(&mOverlay);
+  painter.translate(offset);
 
   int width = resolution.width();
   int height = resolution.height();
