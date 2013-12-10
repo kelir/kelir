@@ -6,10 +6,8 @@
 class PaintCanvas;
 
 class LineTool : public StrokeTool {
-  Q_OBJECT;
-
 public:
-  explicit LineTool(QObject *parent = 0);
+  explicit LineTool();
 
   void mousePressEvent(QMouseEvent *event, PaintCanvas *canvas);
   void mouseMoveEvent(QMouseEvent *event, PaintCanvas *canvas);

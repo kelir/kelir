@@ -4,8 +4,7 @@
 #include "../main/paintcanvas.hpp"
 #include "stroketool.hpp"
 
-StrokeTool::StrokeTool(QObject *parent) :
-  AbstractTool(parent), m_pStrokePoints(0) {
+StrokeTool::StrokeTool() : m_pStrokePoints(0) {
 }
 
 void

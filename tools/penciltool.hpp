@@ -4,10 +4,8 @@
 #include "stroketool.hpp"
 
 class PencilTool : public StrokeTool {
-  Q_OBJECT;
-
 public:
-  explicit PencilTool(QObject *parent = 0);
+  explicit PencilTool();
 
   void mousePressEvent(QMouseEvent *event, PaintCanvas *canvas);
   void mouseMoveEvent(QMouseEvent *event, PaintCanvas *canvas);

@@ -6,10 +6,8 @@
 class PaintCanvas;
 
 class EraserTool : public StrokeTool {
-  Q_OBJECT;
-
 public:
-  explicit EraserTool(QObject *parent = 0);
+  explicit EraserTool();
 
   void mousePressEvent(QMouseEvent *event, PaintCanvas *canvas);
   void mouseMoveEvent(QMouseEvent *event, PaintCanvas *canvas);

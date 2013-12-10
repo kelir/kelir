@@ -1,7 +1,7 @@
 #include "../main/paintcanvas.hpp"
 #include "erasertool.hpp"
 
-EraserTool::EraserTool(QObject *parent) : StrokeTool(parent) {
+EraserTool::EraserTool() {
   mPen = QPen(QColor::fromRgb(0xff, 0xff, 0xff, 0xff), 50,
               Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
 }

@@ -1,7 +1,7 @@
 #include "../main/paintcanvas.hpp"
 #include "penciltool.hpp"
 
-PencilTool::PencilTool(QObject *parent) : StrokeTool(parent) {
+PencilTool::PencilTool() {
   mPen = QPen(Qt::black, 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
 }
 

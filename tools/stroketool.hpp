@@ -7,10 +7,8 @@
 class QImage;
 
 class StrokeTool : public AbstractTool {
-  Q_OBJECT;
 public:
-  explicit StrokeTool(QObject *parent = 0);
-  virtual ~StrokeTool() {}
+  explicit StrokeTool();
 
   QList<QPointF> *strokePoints() {
     return m_pStrokePoints;

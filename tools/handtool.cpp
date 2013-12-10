@@ -2,9 +2,6 @@
 #include "../main/paintcanvas.hpp"
 #include "handtool.hpp"
 
-HandTool::HandTool(QObject *parent) : AbstractTool(parent) {
-}
-
 void
 HandTool::mousePressEvent(QMouseEvent *event, PaintCanvas *canvas) {
   if(event->button() == Qt::LeftButton) {
