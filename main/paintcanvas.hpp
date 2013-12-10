@@ -23,7 +23,7 @@ public:
   QImage *editImage() const { return m_pEditImage; }
   void setEditImage(QImage image);
   QImage *frameImage() const;
-  void setFrameImage(QImage &image);
+  void setFrameImage(QImage &image, bool doComposite);
   bool isPainting() const { return mIsPainting; }
   void setIsPainting(bool isPainting);
   QTransform transform() const { return mViewTransform; }

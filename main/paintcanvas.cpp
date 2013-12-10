@@ -44,7 +44,7 @@ PaintCanvas::frameImage() const {
 }
 
 void
-PaintCanvas::setFrameImage(QImage &newImage) {
+PaintCanvas::setFrameImage(QImage &newImage, bool doComposite) {
   Scene *scene = m_pDocument->currentScene();
   QPoint offset = mViewTransform.inverted().map(newImage.offset());
   newImage.setOffset(offset);
@@ -55,18 +55,13 @@ PaintCanvas::setFrameImage(QImage &newImage) {
 
   QMap<int, AbstractFrame *>::iterator iter = layer
     ->frameIter(scene->currentFrame());
-
   AbstractFrame *frame = iter.value();
-  if(frame->m_pImage) {
-    QImage *unionImage = compositeFrameImages(frame->m_pImage, newImage);
-    if(unionImage != frame->m_pImage) {
-      delete frame->m_pImage;
-      frame->m_pImage = unionImage;
-    }
-  }
-  else
-    frame->m_pImage = new QImage(newImage);
+  QImage *unionImage = (frame->m_pImage && doComposite) ?
+    compositeFrameImages(frame->m_pImage, newImage) : new QImage(newImage);
+  if(frame->m_pImage && unionImage != frame->m_pImage)
+    delete frame->m_pImage;
 
+  frame->m_pImage = unionImage;
   scene->setIsModified();
   refreshCurrentFrame();
 }

@@ -42,7 +42,7 @@ LineTool::mouseReleaseEvent(QMouseEvent *event, PaintCanvas *canvas) {
     canvas->setEditImage(mImageCopy);
     QImage strokeImage = paintStroke(canvas);
     canvas->setIsPainting(false);
-    canvas->setFrameImage(strokeImage);
+    canvas->setFrameImage(strokeImage, true);
   }
 }
 
