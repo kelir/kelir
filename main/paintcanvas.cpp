@@ -114,7 +114,11 @@ PaintCanvas::setCurrentFrame(int frameIndex) {
   QPoint frameOffset;
   m_pEditImage->fill(qRgb(255, 255, 255));
 
-  foreach(AbstractLayer *_layer, m_pDocument->currentScene()->layers()) {
+  QListIterator<AbstractLayer *> iter(m_pDocument->currentScene()->layers());
+  AbstractLayer *_layer = 0;
+  iter.toBack();
+  while(iter.hasPrevious()) {
+    _layer = iter.previous();
     if(!_layer->isVisible())
       continue;
     DrawableLayer *layer = qobject_cast<DrawableLayer *>(_layer);
