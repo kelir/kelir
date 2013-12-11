@@ -54,6 +54,15 @@ Scene::setIsModified() {
 }
 
 void
+Scene::setIsFrameModified() {
+  Document *document = qobject_cast<Document *>(parent());
+  if(document)
+    document->setIsModified(true);
+
+  emit frameModified();
+}
+
+void
 Scene::setDuration(int duration) {
   mDuration = duration;
   setIsModified();

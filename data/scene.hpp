@@ -23,6 +23,7 @@ public:
 
 public slots:
   void setIsModified();
+  void setIsFrameModified();
   void setDuration(int duration);
   void setName(QString &name);
   void setCurrentFrame(int frameIndex);
@@ -30,6 +31,7 @@ public slots:
 signals:
   void currentFrameChanged(int frameIndex);
   void modified();
+  void frameModified();
 
 protected:
   int mDuration;

@@ -24,9 +24,10 @@ const int Header::mButtonWidth = 18;
 const int Header::mFrameWidth = 9;
 
 Header::Header(QWidget *parent) :
-  QFrame(parent), m_pScene(0), mFramesVisible(1), mFirstFrameVisible(1) {
+  QFrame(parent), m_pScene(0),
+  mFramesVisible(1), mFirstFrameVisible(1), mTickAreaLength(1) {
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  setAutoFillBackground(true);
+  setAutoFillBackground(false);
   setMinimumSize(QSize(100, mMinimumHeight));
   setFrameStyle(QFrame::Panel | QFrame::Raised);
 
@@ -91,8 +92,7 @@ Header::paintEvent(QPaintEvent *event) {
 
   QPainter painter;
   QRect dirtyRect = event->rect();
-  QRect dirtyFramesRect = dirtyRect.adjusted(mFramesTicksPos, 0,
-					     mFramesTicksPos, 0);
+  QRect dirtyFramesRect = dirtyRect.translated(mFramesTicksPos, 0);
 
   painter.begin(this);
   painter.drawPixmap(dirtyFramesRect, mPixmapFinal, dirtyRect);
@@ -101,6 +101,8 @@ Header::paintEvent(QPaintEvent *event) {
 
 void
 Header::resizeEvent(QResizeEvent *) {
+  adjustTickAreaLength();
+
   refreshPixmap();
   update();
 }
@@ -118,6 +120,14 @@ Header::adjustFramesTicksPos(int pos) {
   m_pVisibleButton->move
     (pos - (mButtonWidth * 2) - 8, (height() - mButtonWidth) / 2);
 
+  adjustTickAreaLength();
+
+  refreshPixmap();
+  update();
+}
+
+void
+Header::adjustTickAreaLength() {
   mTickAreaLength = width() - mFramesTicksPos;
   if(mTickAreaLength < FrameSpace::mMinimumWidth) {
     mTickAreaLength = FrameSpace::mMinimumWidth;
@@ -126,9 +136,7 @@ Header::adjustFramesTicksPos(int pos) {
 
   mFramesVisible = qMax(1, (mTickAreaLength / mFrameWidth));
   emit framesVisibleChanged(mFramesVisible);
-
-  refreshPixmap();
-  update();
+  resetBufferImage();
 }
 
 void
@@ -140,41 +148,30 @@ Header::setScene(Scene *scene) {
 void
 Header::setFirstFrameVisible(int frame) {
   mFirstFrameVisible = frame;
+  resetBufferImage();
+
   refreshPixmap();
   update();
 }
 
-bool
-Header::needRefreshTicks() {
-  static int oldTickAreaLength = 0;
-  static int oldFirstFrameVisible = 0;
-  static Scene *oldScene = 0;
-
-  bool refresh = (mTickAreaLength > oldTickAreaLength ||
-		  mFirstFrameVisible != oldFirstFrameVisible ||
-		  m_pScene != oldScene);
-
-  if(refresh) {
-    oldTickAreaLength = mTickAreaLength;
-    oldFirstFrameVisible = mFirstFrameVisible;
-    oldScene = m_pScene;
-  }
-
-  return refresh;
+void
+Header::resetBufferImage() {
+  mPixmapFinal = QPixmap(mTickAreaLength, mMinimumHeight - 1);
+  mImageTicks = QImage(mTickAreaLength, mMinimumHeight - 1,
+		       QImage::Format_ARGB32_Premultiplied);
+  mImageTicks.fill(0);
+  drawTicks();
 }
 
 void
 Header::refreshPixmap() {
-  if(needRefreshTicks()) {
-    mImageTicks = QImage(mTickAreaLength, mMinimumHeight - 1,
-			 QImage::Format_ARGB32_Premultiplied);
-    mImageTicks.fill(qRgba(0, 0, 0, 0));
-    drawTicks();
-  }
+  drawIndicators();
 
-  mPixmapFinal = QPixmap(mImageTicks.size());
-  if(m_pScene)
-    drawIndicators();
+  QPainter painter;
+  painter.begin(&mPixmapFinal);
+  painter.initFrom(this);
+  painter.drawImage(0, 0, mImageTicks);
+  painter.end();
 }
 
 void
@@ -215,18 +212,28 @@ Header::drawTicks() {
 
 void
 Header::drawIndicators() {
+  static int prevMarkerPosX = 0;
+  static QRect markerRect = QRect(0, 0, mFrameWidth + 1, height());
+  static QBrush backgroundBrush = palette().brush(QPalette::Background);
+  static QColor markerColor = QColor(0xff, 0x44, 0x44);
+  int markerPosX = 0;
+
   mPixmapFinal.fill(this, 0, 0);
+  if(!m_pScene)
+    return;
 
   QPainter painter;
   painter.begin(&mPixmapFinal);
   painter.initFrom(this);
 
-  painter.fillRect
-    ((m_pScene->currentFrame() - mFirstFrameVisible) * mFrameWidth, 0,
-     mFrameWidth + 1, height(), QColor(0xff, 0x44, 0x44));
-  painter.drawImage(0, 0, mImageTicks);
+  markerPosX = (m_pScene->currentFrame() - mFirstFrameVisible)
+    * mFrameWidth;
+
+  painter.fillRect(markerRect.translated(prevMarkerPosX, 0), backgroundBrush);
+  painter.fillRect(markerRect.translated(markerPosX, 0), markerColor);
 
   painter.end();
+  prevMarkerPosX = markerPosX;
 }
 
 
@@ -249,12 +256,12 @@ void
 AbstractSpace::setScene(Scene *scene) {
   m_pScene = scene;
   setFirstLayerVisible(0);
-  refreshPixmap(true);
 }
 
 void
 AbstractSpace::setFirstLayerVisible(int layer) {
   mFirstLayerVisible = layer;
+  resetBufferImage();
   refreshPixmap();
   update();
 }
@@ -284,20 +291,19 @@ AbstractSpace::paintEvent(QPaintEvent *event) {
 
 void
 AbstractSpace::resizeEvent(QResizeEvent *) {
-  int totalLayers = m_pScene ? m_pScene->layers().count() : 0,
-    maxLayersVisible = height() / mLayerHeight,
-    remainingLayers = totalLayers - mFirstLayerVisible,
-    currentLayersVisible = qMin(totalLayers, maxLayersVisible),
-    newLayersVisible = qMin(currentLayersVisible, remainingLayers);
+  int maxLayersVisible = height() / mLayerHeight,
+    totalLayers = m_pScene ? m_pScene->layers().count() : 0,
+    newLayersVisible = qMin(maxLayersVisible, totalLayers),
+    newFirstLayerVisible = qMin(mFirstLayerVisible,
+				totalLayers - newLayersVisible);
 
-  if(remainingLayers > 0 && remainingLayers < currentLayersVisible)
-    setFirstLayerVisible(totalLayers - maxLayersVisible);
-
+  setFirstLayerVisible(newFirstLayerVisible);
   if(newLayersVisible > 0 && mLayersVisible != newLayersVisible) {
     mLayersVisible = newLayersVisible;
     emit layersVisibleChanged(mLayersVisible);
   }
 
+  resetBufferImage();
   refreshPixmap();
   update();
 }
@@ -363,11 +369,11 @@ LayerSpace::mousePressEvent(QMouseEvent *event) {
   }
   else if(layer != m_pScene->currentLayer())
     m_pScene->setCurrentLayer(layer);
-  else {
+  else
     mIsDragging = true;
-  }
 
-  refreshPixmap(true);
+  drawLayers();
+  refreshPixmap();
   update();
 }
 
@@ -391,9 +397,9 @@ LayerSpace::mouseReleaseEvent(QMouseEvent *) {
   if(!m_pScene)
     return;
 
-  if(!mIsDragging) {
+  if(!mIsDragging)
     refreshPixmap();
-  } else {
+  else {
     mIsDragging = false;
     AbstractLayer *currentLayer = m_pScene->currentLayer();
     int currentIndex = m_pScene->layers().indexOf(currentLayer);
@@ -405,8 +411,9 @@ LayerSpace::mouseReleaseEvent(QMouseEvent *) {
     m_pScene->layers().insert(targetIndex, currentLayer);
 
     emit layersChanged();
-    refreshPixmap(true);
+    drawLayers();
   }
+  refreshPixmap();
   update();
 }
 
@@ -416,33 +423,17 @@ LayerSpace::resizeEvent(QResizeEvent *event) {
   AbstractSpace::resizeEvent(event);
 }
 
-bool
-LayerSpace::needRefreshSpace() {
-  static int oldLayersVisible = 0;
-  static int oldFirstLayerVisible = 0;
-  static int oldWidth = 0;
-
-  bool refresh = (mLayersVisible > oldLayersVisible ||
-                  mFirstLayerVisible != oldFirstLayerVisible ||
-                  width() != oldWidth);
-
-  oldLayersVisible = mLayersVisible;
-  oldFirstLayerVisible = mFirstLayerVisible;
-  oldWidth = width();
-
-  return refresh;
+void
+LayerSpace::resetBufferImage() {
+  mPixmapSpace = QPixmap(width(), height());
+  drawLayers();
 }
 
 void
-LayerSpace::refreshPixmap(bool forceRedrawLayers) {
+LayerSpace::refreshPixmap() {
   if(!m_pScene)
     return;
 
-  if(needRefreshSpace() || forceRedrawLayers) {
-    mPixmapSpace = QPixmap(width(), height());
-    mPixmapSpace.fill(this, 0, 0);
-    drawLayers();
-  }
   mPixmapFinal = mPixmapSpace.copy();
   drawIndicators();
 
@@ -451,6 +442,8 @@ LayerSpace::refreshPixmap(bool forceRedrawLayers) {
 
 void
 LayerSpace::drawLayers() {
+  mPixmapSpace.fill(this, 0, 0);
+
   QPainter painter;
   painter.begin(&mPixmapSpace);
   painter.initFrom(this);
@@ -558,16 +551,22 @@ FrameSpace::~FrameSpace() {}
 
 void
 FrameSpace::setScene(Scene *scene) {
-  if(m_pScene)
+  if(m_pScene) {
     disconnect(m_pScene, SIGNAL(currentFrameChanged(int)),
 	       this, SLOT(adjustLayers()));
+    disconnect(m_pScene, SIGNAL(frameModified()),
+	       this, SLOT(adjustFrames()));
+  }
 
   setFirstFrameVisible(1);
   AbstractSpace::setScene(scene);
 
-  if(m_pScene)
+  if(m_pScene) {
     connect(m_pScene, SIGNAL(currentFrameChanged(int)),
 	    this, SLOT(adjustLayers()));
+    connect(m_pScene, SIGNAL(frameModified()),
+	    this, SLOT(adjustFrames()));
+  }
 }
 
 void
@@ -614,7 +613,7 @@ FrameSpace::mouseReleaseEvent(QMouseEvent *event) {
   if(event->button() == Qt::LeftButton)
     frameTranslateEnd(event);
 
-  refreshPixmap(true);
+  refreshPixmap();
   update();
 }
 
@@ -636,8 +635,7 @@ FrameSpace::mouseDoubleClickEvent(QMouseEvent *event) {
      frameIndex != frameAtPos(pos)) {
     layer->insertFrameObjAt(frameIndex);
     m_pScene->setCurrentFrame(m_pScene->currentFrame());
-    refreshPixmap(true);
-    update();
+    m_pScene->setIsFrameModified();
   }
 }
 
@@ -658,50 +656,20 @@ FrameSpace::frameAtPos(const QPoint &point) {
   return frameIndex;
 }
 
-bool
-FrameSpace::needRefreshSpace() {
-  static int oldLayersVisible = 0;
-  static int oldFirstLayerVisible = 0;
-  static int oldFramesVisible = 0;
-  static int oldFirstFrameVisible = 0;
-  static Scene *oldScene = 0;
+void
+FrameSpace::resetBufferImage() {
+  QSize size(mFramesVisible * mFrameWidth, mLayersVisible * mLayerHeight + 1);
+  mPixmapSpace = QPixmap(size);
+  mImageInterval = QImage(size, QImage::Format_ARGB32_Premultiplied);
+  mImageInterval.fill(0);
+  mImageFrames = mImageInterval.copy();
 
-  bool refresh = (mFramesVisible > oldFramesVisible ||
-                  mFirstFrameVisible != oldFirstFrameVisible ||
-                  mLayersVisible != oldLayersVisible ||
-                  mFirstLayerVisible != oldFirstLayerVisible ||
-		  m_pScene != oldScene);
-
-  if(refresh) {
-    oldFramesVisible = mFramesVisible;
-    oldFirstFrameVisible = mFirstFrameVisible;
-    oldLayersVisible = mLayersVisible;
-    oldFirstLayerVisible = mFirstLayerVisible;
-    oldScene = m_pScene;
-  }
-
-  return refresh;
+  drawSlots();
+  drawFrames();
 }
 
 void
-FrameSpace::refreshPixmap(bool forceRedrawFrames) {
-  bool refreshSpace = needRefreshSpace();
-
-  if(refreshSpace) {
-    mPixmapSpace = QPixmap(mFramesVisible * mFrameWidth,
-                           mLayersVisible * mLayerHeight + 1);
-    mImageInterval = QImage(mPixmapSpace.size(),
-                            QImage::Format_ARGB32_Premultiplied);
-    mImageInterval.fill(0);
-    drawSlots();
-  }
-  if(refreshSpace || forceRedrawFrames) {
-    mImageFrames = QImage(mPixmapSpace.size(),
-                          QImage::Format_ARGB32_Premultiplied);
-    mImageFrames.fill(0);
-    drawFrames();
-  }
-
+FrameSpace::refreshPixmap() {
   mPixmapFinal = mPixmapSpace.copy();
   if(m_pScene)
     drawIndicators();
@@ -871,7 +839,8 @@ FrameSpace::frameTranslateStart(QMouseEvent *event) {
     mSelectionPoint = mSelectionRect.center();
 
     mIsSelecting = true;
-  } else {
+  }
+  else {
     mDragFrameOffset = (event->x() - mSelectionRect.left()) / mFrameWidth;
     mTargetRect = mSelectionRect;
     mImageSelection = mImageFrames.copy(mSelectionRect);
@@ -899,7 +868,8 @@ FrameSpace::frameTranslate(QMouseEvent *event) {
       mSelectionRect.setTop(topLeft.y());
     else
       mSelectionRect.setBottom(topLeft.y() + mLayerHeight);
-  } else if(mIsDragging) {
+  }
+  else if(mIsDragging) {
     int framePos = (pos.x() / mFrameWidth) - mDragFrameOffset;
     mTargetRect.moveLeft(framePos * mFrameWidth);
   }
@@ -925,7 +895,8 @@ FrameSpace::frameTranslateEnd(QMouseEvent *) {
       jStart = firstFrame + selectedFrameRange - 1;
       jEnd = firstFrame - 1;
       jDelta = -1;
-    } else if(frameDelta == 0)
+    }
+    else if(frameDelta == 0)
       selectedLayers = 0;
 
     for(int i = 0; i < selectedLayers; ++i) {
@@ -954,7 +925,7 @@ FrameSpace::frameTranslateEnd(QMouseEvent *) {
     mIsDragging = false;
     mSelectionRect.setRect(0, 0, 0, 0);
     m_pScene->setCurrentFrame(m_pScene->currentFrame());
-    m_pScene->setIsModified();
+    m_pScene->setIsFrameModified();
   }
 }
 
@@ -977,6 +948,7 @@ FrameSpace::setFirstFrameVisible(int frame) {
     mSelectionRect.translate(delta * mFrameWidth, 0);
 
   mFirstFrameVisible = frame;
+  resetBufferImage();
   refreshPixmap();
   update();
 }
@@ -990,13 +962,21 @@ FrameSpace::setFramesVisible(int count) {
   int maxFrameVisible = width() / mFrameWidth;
 
   mFramesVisible = qBound(maxFrameVisible, count, remainingFrameCount);
+  resetBufferImage();
   refreshPixmap();
   update();
 }
 
 void
 FrameSpace::adjustLayers() {
-  refreshPixmap(true);
+  refreshPixmap();
+  update();
+}
+
+void
+FrameSpace::adjustFrames() {
+  drawFrames();
+  refreshPixmap();
   update();
 }
 

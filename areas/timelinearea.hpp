@@ -37,6 +37,7 @@ namespace TimeLineUI {
   public slots:
     void setFirstFrameVisible(int);
     void adjustFramesTicksPos(int);
+    void adjustTickAreaLength();
 
   signals:
     void framesVisibleChanged(int);
@@ -50,7 +51,7 @@ namespace TimeLineUI {
     int indexAtPos(const QPoint &point);
 
   private:
-    bool needRefreshTicks();
+    void resetBufferImage();
     void refreshPixmap();
     void drawTicks();
     void drawIndicators();
@@ -92,7 +93,8 @@ namespace TimeLineUI {
     virtual void wheelEvent(QWheelEvent *);
     virtual void paintEvent(QPaintEvent *);
     virtual void resizeEvent(QResizeEvent *);
-    virtual void refreshPixmap(bool forceRedraw = false) = 0;
+    virtual void resetBufferImage() = 0;
+    virtual void refreshPixmap() = 0;
     AbstractLayer *layerAtPos(const QPoint &point);
 
     Scene *m_pScene;
@@ -127,8 +129,8 @@ namespace TimeLineUI {
     void mouseMoveEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
     void resizeEvent(QResizeEvent *);
-    bool needRefreshSpace();
-    void refreshPixmap(bool forceRedraw = false);
+    void resetBufferImage();
+    void refreshPixmap();
     void drawLayers();
     void drawIndicators();
 
@@ -155,6 +157,7 @@ namespace TimeLineUI {
     virtual void setFirstFrameVisible(int);
     virtual void setFramesVisible(int);
     virtual void adjustLayers();
+    virtual void adjustFrames();
 
   signals:
     void horizontalScroll(int);
@@ -167,8 +170,8 @@ namespace TimeLineUI {
     void mouseDoubleClickEvent(QMouseEvent *);
     int indexAtPos(const QPoint &point);
     int frameAtPos(const QPoint &point);
-    bool needRefreshSpace();
-    void refreshPixmap(bool forceRedraw = false);
+    void resetBufferImage();
+    void refreshPixmap();
     void drawSlots();
     void drawFrames();
     void drawIndicators();

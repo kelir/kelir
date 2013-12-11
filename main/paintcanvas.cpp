@@ -62,7 +62,7 @@ PaintCanvas::setFrameImage(QImage &newImage, bool doComposite) {
     delete frame->m_pImage;
 
   frame->m_pImage = unionImage;
-  scene->setIsModified();
+  scene->setIsFrameModified();
   refreshCurrentFrame();
 }
 
