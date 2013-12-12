@@ -417,6 +417,7 @@ PaintCanvas::viewTransform(QMouseEvent *event) {
     m_pEditImage->setOffset(m_pEditImage->offset() + delta);
     setViewTransform(mTempTransform * mCenterTransform);
 
+    mPixmap.fill();
     refreshPixmap();
   }
 }
